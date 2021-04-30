@@ -79,6 +79,7 @@ int	main(int argc, char *argv[], char *envp[]) {
 			}
 			start = end + 1;
 		}
+		close(fd_in);
 		i = pos_semicolon + 1;
 	}
 	return (0);
