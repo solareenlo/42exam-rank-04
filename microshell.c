@@ -2,55 +2,70 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t	ft_strlen(char *s) {
-	size_t	i = 0;
+size_t	ft_strlen(char *s)
+{
+	size_t	i;
+
+	i = 0;
 	while (s[i])
 		i++;
 	return (i);
 }
 
-void	_puterr(char *err, char *path) {
+void	_puterr(char *err, char *path)
+{
 	write(2, err, ft_strlen(err));
-	if (path) {
+	if (path)
+	{
 		write(2, path, ft_strlen(path));
 		write(2, "\n", 1);
 	}
 	exit(1);
 }
 
-char	**_subargv(char *argv[], int start, int end) {
+char	**_subargv(char *argv[], int start, int end)
+{
 	char	**res;
-	int		i = 0;
-	if ((res = malloc(sizeof(char *) * (end - start + 1))) == NULL)
+	int		i;
+
+	res = malloc(sizeof(char *) * (end - start + 1));
+	if (res == NULL)
 		return (NULL);
+	i = 0;
 	while (start < end)
 		res[i++] = argv[start++];
 	res[i] = NULL;
 	return (res);
 }
 
-int	main(int argc, char *argv[], char *envp[]) {
+int	main(int argc, char *argv[], char *envp[])
+{
 	int		i = 1, pos_semicolon, start, end;
 	int		fd[2], fd_in;
 	pid_t	pid;
 	char	**av;
 
-	while (i < argc) {
+	while (i < argc)
+	{
 		pos_semicolon = start = end = i;
 		while (pos_semicolon < argc && strcmp(argv[pos_semicolon], ";"))
 			pos_semicolon++;
 		fd_in = 0;
-		while (start < pos_semicolon) {
+		while (start < pos_semicolon)
+		{
 			end = start;
 			while (end < pos_semicolon && strcmp(argv[end], "|"))
 				end++;
-			if ((av = _subargv(argv, start, end)) == NULL)
+			av = _subargv(argv, start, end);
+			if (av == NULL)
 				_puterr("error: fatal\n", NULL);
 			if (pipe(fd) == -1)
 				_puterr("error: fatal\n", NULL);
-			if ((pid = fork()) == -1)
+			pid = fork();
+			if (pid == -1)
 				_puterr("error: fatal\n", NULL);
-			if (pid == 0) {
+			if (pid == 0)
+			{
 				if (dup2(fd_in, 0) == -1)
 					_puterr("error: fatal\n", NULL);
 				if (end < pos_semicolon && dup2(fd[1], 1) == -1)
@@ -58,7 +73,8 @@ int	main(int argc, char *argv[], char *envp[]) {
 				close(fd_in);
 				close(fd[0]);
 				close(fd[1]);
-				if (strcmp(av[0], "cd") == 0) {
+				if (strcmp(av[0], "cd") == 0)
+				{
 					if (end - start != 2)
 						_puterr("error: cd: bad arguments\n", NULL);
 					if (chdir(av[1]))
@@ -69,11 +85,12 @@ int	main(int argc, char *argv[], char *envp[]) {
 				free(av);
 				exit(0);
 			}
-			else {
+			else
+			{
 				waitpid(pid, NULL, 0);
+				close(fd[1]);
 				if (fd_in)
 					close(fd_in);
-				close(fd[1]);
 				fd_in = fd[0];
 				free(av);
 			}
