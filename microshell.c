@@ -40,11 +40,12 @@ char	**_subargv(char *argv[], int start, int end)
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int		i = 1, pos_semicolon, start, end;
+	int		i, pos_semicolon, start, end;
 	int		fd[2], fd_in;
 	pid_t	pid;
 	char	**av;
 
+	i = 1;
 	while (i < argc)
 	{
 		pos_semicolon = start = end = i;
