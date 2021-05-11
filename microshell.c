@@ -65,7 +65,7 @@ int	main(int argc, char *argv[], char *envp[])
 			pid = fork();
 			if (pid == -1)
 				_puterr("error: fatal\n", NULL);
-			if (pid == 0)
+			else if (pid == 0)
 			{
 				if (dup2(fd_in, 0) == -1)
 					_puterr("error: fatal\n", NULL);
